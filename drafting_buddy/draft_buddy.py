@@ -36,17 +36,15 @@ player_ranks = {}
 for player_id, info in data.items():
     weekly_projections[player_id] = {}
     for wk in range(1, 18):
-        try:
-            def_strength= def_scale[vs[wk][info['team']]]
-        except KeyError:
-            weekly_projections[player_id][wk] = 0
-            continue
+        def_team = vs[str(wk)].get(info['team'], None)
+        def_strength = def_scale[def_team] if def_team else None
         fp = float(info['fp']) / 16
-        if info['pos'] != 'D/ST':
-            def_adj_fp = fp + (fp * -def_scale[vs[wk][info['team']]] * DEF_ADJ)
-        else:
-            def_adj_fp = fp
-        weekly_projections[player_id][wk] = def_adj_fp
+        if def_team:
+            if info['pos'] != 'D/ST':
+                def_adj_fp = fp + (fp * -def_strength * DEF_ADJ)
+            else:
+                def_adj_fp = fp
+        weekly_projections[player_id][wk] = def_adj_fp if def_team else 0
 
 pass
 players = [
